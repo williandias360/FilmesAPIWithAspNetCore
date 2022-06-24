@@ -55,5 +55,17 @@ namespace FilmesAPI.Services
 
             return Result.Ok();
         }
+
+        public Result DeletaEndereco(int id)
+        {
+            Endereco endereco = _context.Enderecos.FirstOrDefault(endereco => endereco.Id == id);
+            if (endereco == null)
+                return Result.Fail("Endereço não foi encontrado");
+            
+            _context.Remove(endereco);
+            _context.SaveChanges();
+
+            return Result.Ok();
+        }
     }
 }
