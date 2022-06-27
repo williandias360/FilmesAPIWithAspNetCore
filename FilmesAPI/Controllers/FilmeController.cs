@@ -4,6 +4,7 @@ using FilmesAPI.Data.Dtos;
 using FilmesAPI.Models;
 using FilmesAPI.Services;
 using FluentResults;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace FilmesAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class FilmeController: ControllerBase
+    public class FilmeController : ControllerBase
     {
         private FilmeService _filmeService;
         public FilmeController(FilmeService filmeService)
@@ -22,6 +23,7 @@ namespace FilmesAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public IActionResult AdicionarFilme([FromBody] CreateFilmeDto filmeDto)
         {
             ReadFilmeDto readDto = _filmeService.AdicionarFilme(filmeDto);
@@ -29,13 +31,14 @@ namespace FilmesAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "admin, regular", Policy = "IdadeMinima")]
         public IActionResult RecuperarFilmes([FromQuery] int? classificacaoEtaria = null)
         {
-            List<ReadFilmeDto> readDto =  _filmeService.RecupearFilme(classificacaoEtaria);
+            List<ReadFilmeDto> readDto = _filmeService.RecupearFilme(classificacaoEtaria);
 
-            if (readDto != null) 
+            if (readDto != null)
                 return Ok(readDto);
-            
+
             return NotFound();
         }
 
@@ -66,7 +69,7 @@ namespace FilmesAPI.Controllers
             Result resultado = _filmeService.DeletarFilme(id);
             if (resultado == null)
                 return NotFound();
-            
+
             return NoContent();
         }
     }
